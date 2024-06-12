@@ -1,35 +1,36 @@
 package com.example.reproducer;
 
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.IOException;
+import com.example.reproducer.Adapter.PlayListAdapter;
+import com.example.reproducer.Model.Cancion;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button play,stop,prev,next;
+    private int minCur, secCur,minDur, secDur;
     private SeekBar barra;
     private ImageView portada;
     private Handler handler;
     private MediaPlayer mediaPlayer;
-    private List<Integer> canciones = new ArrayList<>();
-    private HashMap<Integer ,String> covers = new HashMap<>();
+    private RecyclerView recyclerView;
+    private PlayListAdapter adapter;
+    private List<Cancion> canciones = new ArrayList<>();
+    private TextView time;
     private int pos = 0;
 
     @Override
@@ -43,17 +44,51 @@ public class MainActivity extends AppCompatActivity {
         portada = findViewById(R.id.portada);
         prev = findViewById(R.id.prev);
         next = findViewById(R.id.next);
+        recyclerView = findViewById(R.id.recyclerView);
+        time = findViewById(R.id.time);
 
-        canciones.add(R.raw.one);
-        canciones.add(R.raw.torii);
-
-        covers.put(R.raw.one,"https://i1.sndcdn.com/artworks-000058395969-vegj94-t500x500.jpg");
-        covers.put(R.raw.torii,"https://t2.genius.com/unsafe/504x504/https%3A%2F%2Fimages.genius.com%2Fb9a026c00e5a81c64a51005fed0b1836.1000x1000x1.png");
+        canciones.add(new Cancion(R.raw.one,"https://i1.sndcdn.com/artworks-000058395969-vegj94-t500x500.jpg","ONE"));
+        canciones.add(new Cancion(R.raw.torii,"https://t2.genius.com/unsafe/504x504/https%3A%2F%2Fimages.genius.com%2Fb9a026c00e5a81c64a51005fed0b1836.1000x1000x1.png","Torii"));
 
 
-        mediaPlayer = MediaPlayer.create(this,canciones.get(pos));
+        adapter = new PlayListAdapter(this);
+        adapter.setCanciones(canciones);
+        adapter.setOnClickListener(view->{
+            int position = recyclerView.getChildAdapterPosition(view);
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+            mediaPlayer = MediaPlayer.create(this,canciones.get(position).getSource());
+            ImageDownloader.downloadImage(canciones.get(position).getCover(),portada);
+            barra.setMax(mediaPlayer.getDuration());
+
+            minCur = mediaPlayer.getCurrentPosition()/1000/60;
+            secCur = mediaPlayer.getCurrentPosition()/1000%60;
+
+            minDur = mediaPlayer.getDuration()/1000/60;
+            secDur = mediaPlayer.getDuration()/1000%60;
+
+            time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
+
+            pos = position;
+
+        });
+
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        mediaPlayer = MediaPlayer.create(this,canciones.get(pos).getSource());
         barra.setMax(mediaPlayer.getDuration());
-        ImageDownloader.downloadImage(covers.get(canciones.get(pos)),portada);
+
+        minCur = mediaPlayer.getCurrentPosition()/1000/60;
+        secCur = mediaPlayer.getCurrentPosition()/1000%60;
+
+        minDur = mediaPlayer.getDuration()/1000/60;
+        secDur = mediaPlayer.getDuration()/1000%60;
+
+        time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
+
+        ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
 
         play.setOnClickListener(view->{
             mediaPlayer.start();
@@ -76,9 +111,17 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
-            mediaPlayer = MediaPlayer.create(this,canciones.get(pos));
-            ImageDownloader.downloadImage(covers.get(canciones.get(pos)),portada);
+            mediaPlayer = MediaPlayer.create(this,canciones.get(pos).getSource());
+            ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
             barra.setMax(mediaPlayer.getDuration());
+
+            minCur = mediaPlayer.getCurrentPosition()/1000/60;
+            secCur = mediaPlayer.getCurrentPosition()/1000%60;
+
+            minDur = mediaPlayer.getDuration()/1000/60;
+            secDur = mediaPlayer.getDuration()/1000%60;
+
+            time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
         });
 
         prev.setOnClickListener(view->{
@@ -92,9 +135,17 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
-            mediaPlayer = MediaPlayer.create(this,canciones.get(pos));
-            ImageDownloader.downloadImage(covers.get(canciones.get(pos)),portada);
+            mediaPlayer = MediaPlayer.create(this,canciones.get(pos).getSource());
+            ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
             barra.setMax(mediaPlayer.getDuration());
+
+            minCur = mediaPlayer.getCurrentPosition()/1000/60;
+            secCur = mediaPlayer.getCurrentPosition()/1000%60;
+
+            minDur = mediaPlayer.getDuration()/1000/60;
+            secDur = mediaPlayer.getDuration()/1000%60;
+
+            time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
 
         });
         barra.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -103,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser)
                     mediaPlayer.seekTo(progress);
+
             }
 
             @Override
@@ -126,6 +178,11 @@ public class MainActivity extends AppCompatActivity {
             if(mediaPlayer != null){
                 barra.setProgress(mediaPlayer.getCurrentPosition());
                 handler.postDelayed(this,100);
+
+                minCur = mediaPlayer.getCurrentPosition()/1000/60;
+                secCur = mediaPlayer.getCurrentPosition()/1000%60;
+
+                time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
             }
         }
     };
