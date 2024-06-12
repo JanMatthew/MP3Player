@@ -1,6 +1,8 @@
 package com.example.reproducer.Adapter;
 
 import android.content.Context;
+import android.media.MediaPlayer;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.reproducer.ImageDownloader;
+import com.example.reproducer.MainActivity;
 import com.example.reproducer.Model.Cancion;
 import com.example.reproducer.R;
 
@@ -21,10 +24,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     private List<Cancion> canciones;
     private LayoutInflater layoutInflater;
     private View.OnClickListener onClickListener;
+    private Context context;
 
     public PlayListAdapter(Context context){
 
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.context = context;
 
     }
 
@@ -46,9 +51,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     public void onBindViewHolder(@NonNull PlayListViewHolder holder, int position) {
 
         Cancion currentCancion = canciones.get(position);
+        MediaPlayer mediaPlayer = MediaPlayer.create(context,currentCancion.getSource());
         ImageDownloader.downloadImage(currentCancion.getCover(),holder.cover);
         holder.titulo.setText(currentCancion.getTitulo());
-        holder.duracion.setText("2:00");
+
+        int minDur = mediaPlayer.getDuration()/1000/60;
+        int secDur = mediaPlayer.getDuration()/1000%60;
+
+        holder.duracion.setText(minDur + ":" + secDur);
+
+        mediaPlayer.release();
 
     }
 

@@ -3,7 +3,9 @@ package com.example.reproducer;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -22,6 +24,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private Button play,stop,prev,next;
+    private ImageButton playBtn;
     private int minCur, secCur,minDur, secDur;
     private SeekBar barra;
     private ImageView portada;
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Cancion> canciones = new ArrayList<>();
     private TextView time;
     private int pos = 0;
+    private Boolean playing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +50,10 @@ public class MainActivity extends AppCompatActivity {
         next = findViewById(R.id.next);
         recyclerView = findViewById(R.id.recyclerView);
         time = findViewById(R.id.time);
+        playBtn = findViewById(R.id.playBtn);
 
         canciones.add(new Cancion(R.raw.one,"https://i1.sndcdn.com/artworks-000058395969-vegj94-t500x500.jpg","ONE"));
         canciones.add(new Cancion(R.raw.torii,"https://t2.genius.com/unsafe/504x504/https%3A%2F%2Fimages.genius.com%2Fb9a026c00e5a81c64a51005fed0b1836.1000x1000x1.png","Torii"));
-
-
         adapter = new PlayListAdapter(this);
         adapter.setCanciones(canciones);
         adapter.setOnClickListener(view->{
@@ -89,6 +92,21 @@ public class MainActivity extends AppCompatActivity {
         time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
 
         ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
+
+        playBtn.setOnClickListener(view->{
+            if (mediaPlayer.isPlaying()){
+                mediaPlayer.pause();
+                playBtn.setImageResource(android.R.drawable.ic_media_play);
+            }
+            else {
+
+                mediaPlayer.start();
+                Toast.makeText(this,"Si lo hace", Toast.LENGTH_SHORT).show();
+                handler.postDelayed(updateSeekBar, 100);
+                playBtn.setImageResource(android.R.drawable.ic_media_pause);
+
+            }
+        });
 
         play.setOnClickListener(view->{
             mediaPlayer.start();
