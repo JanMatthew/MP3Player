@@ -23,7 +23,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button play,stop,prev,next;
+    private Button prev,next;
     private ImageButton playBtn;
     private int minCur, secCur,minDur, secDur;
     private SeekBar barra;
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private PlayListAdapter adapter;
     private List<Cancion> canciones = new ArrayList<>();
-    private TextView time;
+    private TextView time, titulo;
     private int pos = 0;
     private Boolean playing = false;
 
@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        play = findViewById(R.id.play);
-        stop = findViewById(R.id.stop);
         barra = findViewById(R.id.barra);
         portada = findViewById(R.id.portada);
         prev = findViewById(R.id.prev);
@@ -51,30 +49,15 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         time = findViewById(R.id.time);
         playBtn = findViewById(R.id.playBtn);
+        titulo = findViewById(R.id.tituloCancion);
 
         canciones.add(new Cancion(R.raw.one,"https://i1.sndcdn.com/artworks-000058395969-vegj94-t500x500.jpg","ONE"));
         canciones.add(new Cancion(R.raw.torii,"https://t2.genius.com/unsafe/504x504/https%3A%2F%2Fimages.genius.com%2Fb9a026c00e5a81c64a51005fed0b1836.1000x1000x1.png","Torii"));
         adapter = new PlayListAdapter(this);
         adapter.setCanciones(canciones);
         adapter.setOnClickListener(view->{
-            int position = recyclerView.getChildAdapterPosition(view);
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-            mediaPlayer = MediaPlayer.create(this,canciones.get(position).getSource());
-            ImageDownloader.downloadImage(canciones.get(position).getCover(),portada);
-            barra.setMax(mediaPlayer.getDuration());
-
-            minCur = mediaPlayer.getCurrentPosition()/1000/60;
-            secCur = mediaPlayer.getCurrentPosition()/1000%60;
-
-            minDur = mediaPlayer.getDuration()/1000/60;
-            secDur = mediaPlayer.getDuration()/1000%60;
-
-            time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
-
-            pos = position;
-
+            pos = recyclerView.getChildAdapterPosition(view);
+            playSong();
         });
 
         recyclerView.setAdapter(adapter);
@@ -90,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         secDur = mediaPlayer.getDuration()/1000%60;
 
         time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
+        titulo.setText(canciones.get(pos).getTitulo());
 
         ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
 
@@ -108,15 +92,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        play.setOnClickListener(view->{
-            mediaPlayer.start();
-            Toast.makeText(this,"Si lo hace", Toast.LENGTH_SHORT).show();
-            handler.postDelayed(updateSeekBar, 100);
-        });
-        stop.setOnClickListener(view->{
-            mediaPlayer.pause();
-            handler.removeCallbacks(updateSeekBar);
-        });
 
         next.setOnClickListener(view->{
 
@@ -126,20 +101,7 @@ public class MainActivity extends AppCompatActivity {
             else{
                 ++pos;
             }
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-            mediaPlayer = MediaPlayer.create(this,canciones.get(pos).getSource());
-            ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
-            barra.setMax(mediaPlayer.getDuration());
-
-            minCur = mediaPlayer.getCurrentPosition()/1000/60;
-            secCur = mediaPlayer.getCurrentPosition()/1000%60;
-
-            minDur = mediaPlayer.getDuration()/1000/60;
-            secDur = mediaPlayer.getDuration()/1000%60;
-
-            time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
+            playSong();
         });
 
         prev.setOnClickListener(view->{
@@ -150,20 +112,7 @@ public class MainActivity extends AppCompatActivity {
             else{
                 --pos;
             }
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-            mediaPlayer = MediaPlayer.create(this,canciones.get(pos).getSource());
-            ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
-            barra.setMax(mediaPlayer.getDuration());
-
-            minCur = mediaPlayer.getCurrentPosition()/1000/60;
-            secCur = mediaPlayer.getCurrentPosition()/1000%60;
-
-            minDur = mediaPlayer.getDuration()/1000/60;
-            secDur = mediaPlayer.getDuration()/1000%60;
-
-            time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
+            playSong();
 
         });
         barra.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -187,6 +136,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         handler = new Handler();
+
+    }
+
+    private void playSong() {
+        mediaPlayer.stop();
+        mediaPlayer.release();
+        mediaPlayer = null;
+        mediaPlayer = MediaPlayer.create(this,canciones.get(pos).getSource());
+        ImageDownloader.downloadImage(canciones.get(pos).getCover(),portada);
+        barra.setMax(mediaPlayer.getDuration());
+
+        minCur = mediaPlayer.getCurrentPosition()/1000/60;
+        secCur = mediaPlayer.getCurrentPosition()/1000%60;
+
+        minDur = mediaPlayer.getDuration()/1000/60;
+        secDur = mediaPlayer.getDuration()/1000%60;
+
+        time.setText(minCur + ":" + secCur + "/" +minDur + ":" + secDur);
+
+        mediaPlayer.start();
+        handler.postDelayed(updateSeekBar, 100);
+        playBtn.setImageResource(android.R.drawable.ic_media_pause);
+        titulo.setText(canciones.get(pos).getTitulo());
 
     }
 

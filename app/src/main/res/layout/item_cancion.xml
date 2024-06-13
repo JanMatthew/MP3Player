@@ -24,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/coverItem"
         app:layout_constraintEnd_toStartOf="@+id/duracionItem"
         app:layout_constraintHorizontal_bias="0.5"

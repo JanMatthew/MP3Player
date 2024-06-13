@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/sage"
     tools:context=".MainActivity">
 
     <ImageView
@@ -17,36 +18,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@mipmap/ic_launcher" />
 
-    <Button
-        android:id="@+id/stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="STOP"
-        app:layout_constraintEnd_toStartOf="@+id/play"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/portada" />
-
-    <Button
-        android:id="@+id/play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="PLAY"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/stop"
-        app:layout_constraintTop_toBottomOf="@+id/portada" />
-
     <SeekBar
         android:id="@+id/barra"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        app:layout_constraintEnd_toEndOf="@+id/play"
-        app:layout_constraintStart_toStartOf="@+id/stop"
-        app:layout_constraintTop_toBottomOf="@+id/portada" />
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/portada"
+        app:layout_constraintStart_toStartOf="@+id/portada"
+        app:layout_constraintTop_toBottomOf="@+id/playBtn" />
 
     <Button
         android:id="@+id/next"
@@ -74,6 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:background="@color/grisecito"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -93,10 +73,23 @@
         android:id="@+id/playBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/play"
-        app:layout_constraintEnd_toStartOf="@+id/play"
-        app:layout_constraintStart_toEndOf="@+id/stop"
-        app:layout_constraintTop_toTopOf="@+id/play"
+        android:layout_marginTop="8dp"
+        android:background="@color/sage"
+        app:layout_constraintEnd_toEndOf="@+id/portada"
+        app:layout_constraintStart_toStartOf="@+id/portada"
+        app:layout_constraintTop_toBottomOf="@+id/tituloCancion"
         app:srcCompat="@android:drawable/ic_media_play" />
+
+    <TextView
+        android:id="@+id/tituloCancion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/portada"
+        app:layout_constraintStart_toStartOf="@+id/portada"
+        app:layout_constraintTop_toBottomOf="@+id/portada" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
